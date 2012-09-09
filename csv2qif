@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+# Usage: iconv -f iso88591 input.csv | perl csv2qif > output.csv
+
+use Text::CSV;
+
+# TODO - if posible, set initial amount from last column of last record
+
+my $header = "Type:Bank";
+my $payee = "Payee";
+my $category = "Entertainment";
+
+
+my $csv = Text::CSV->new({
+        binary => 1,
+        sep_char => ';',
+    }) or die 'Could not instantiate Text::CSV: ' . Text::CSV->error_diag();
+
+my $line_no = -1;               # -1 to catch header line
+
+while(my $row = $csv->getline(STDIN)) {
+    # Ignore the first empty line -- TODO: make more robust!
+    next if(scalar @$row == 1);
+
+    $line_no++;
+
+    # Ignore the first (the header) line
+    next unless($line_no);
+
+
+    my ($date, $note, $interrest_date, $amount, $total) = @$row;
+
+    $amount =~ s/,/./;
+
+    my $record = {
+        header      => $header,
+        date        => $date,
+        payee       => $note,
+        memo        => $note,
+        transaction => $amount,
+        address     => "",
+        category    => $category,
+    };
+
+    print "!$header\n";
+    print "D$date\n";
+    print "T$amount\n";
+    print "P$note\n";
+    print "LUnknown\n";
+    print "^\n";
+}
+
+$csv->eof
+    or die 'Could not read entire CSV file: ' . $csv->error_diag();
