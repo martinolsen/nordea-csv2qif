@@ -6,11 +6,6 @@ use Text::CSV;
 
 # TODO - if posible, set initial amount from last column of last record
 
-my $header = "Type:Bank";
-my $payee = "Payee";
-my $category = "Entertainment";
-
-
 my $csv = Text::CSV->new({
         binary => 1,
         sep_char => ';',
@@ -32,17 +27,7 @@ while(my $row = $csv->getline(STDIN)) {
 
     $amount =~ s/,/./;
 
-    my $record = {
-        header      => $header,
-        date        => $date,
-        payee       => $note,
-        memo        => $note,
-        transaction => $amount,
-        address     => "",
-        category    => $category,
-    };
-
-    print "!$header\n";
+    print "!Type:Bank\n";
     print "D$date\n";
     print "T$amount\n";
     print "P$note\n";
